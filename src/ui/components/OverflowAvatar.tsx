@@ -22,11 +22,20 @@ const styles = StyleSheet.createThemedStyleSheet({
 });
 
 export default function OverflowAvatar({ overflow, style }) {
-	return (
-		<View style={style}>
-			<View style={styles.container}>
-				<Text style={styles.text}>+{overflow}</Text>
+	try {
+		if (!overflow || overflow <= 0) {
+			return null;
+		}
+
+		return (
+			<View style={style}>
+				<View style={styles.container}>
+					<Text style={styles.text}>+{overflow}</Text>
+				</View>
 			</View>
-		</View>
-	);
+		);
+	} catch (error) {
+		console.error("[TypingAvatars] Error rendering overflow avatar:", error);
+		return null;
+	}
 };
