@@ -16,6 +16,7 @@ const UserStore = findByStoreName("UserStore");
 
 const AvatarConstants = findByProps("AVATAR_SIZE_MAP");
 
+// Support Discord 345.9+ and Discord Revenge 1.3.0+ avatar size configurations
 let AVATAR_SIZE_MAP = unfreeze(AvatarConstants.AVATAR_SIZE_MAP) as { size12: number };
 let AvatarStyles = unfreeze(AvatarConstants.styles) as { size12: object };
 AVATAR_SIZE_MAP.size12 = 12;
@@ -35,29 +36,38 @@ const styles = StyleSheet.createThemedStyleSheet({
 });
 
 export default function TypingAvatars({ channel }) {
-	const typingIds = useTypingUserIds(channel.id);
+	try {
+		const typingIds = useTypingUserIds(channel.id);
+		
+		if (!typingIds || typingIds.length === 0) {
+			return null;
+		}
 
-	const typingUsers = typingIds.map((id) => UserStore.getUser(id));
+		const typingUsers = typingIds.map((id) => UserStore.getUser(id)).filter(user => user);
 
-	function renderAvatar(user) {
-		return <Avatar user={user} size="size12" guildId={channel.guild_id} />
-	};
+		function renderAvatar(user) {
+			return <Avatar user={user} size="size12" guildId={channel.guild_id} />
+		};
 
-	return (
-		<Pressable onPress={() => showTypingActionSheet(channel)}>
-			<SummarizedIconRow
-				iconWrapperStyle={styles.wrapper}
-				items={typingUsers}
-				max={5}
-				offsetAmount={-8}
-				overflowComponent={OverflowAvatar}
-				overflowStyle={styles.wrapper}
-				style={{
-					height: 16,
-					paddingRight: 2
-				}}
-				renderItem={renderAvatar}
-			/>
-		</Pressable>
-	);
+		return (
+			<Pressable onPress={() => showTypingActionSheet(channel)}>
+				<SummarizedIconRow
+					iconWrapperStyle={styles.wrapper}
+					items={typingUsers}
+					max={5}
+					offsetAmount={-8}
+					overflowComponent={OverflowAvatar}
+					overflowStyle={styles.wrapper}
+					style={{
+						height: 16,
+						paddingRight: 2
+					}}
+					renderItem={renderAvatar}
+				/>
+			</Pressable>
+		);
+	} catch (error) {
+		console.error("[TypingAvatars] Error rendering typing avatars:", error);
+		return null;
+	}
 };
