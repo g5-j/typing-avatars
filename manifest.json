@@ -1,6 +1,6 @@
 {
     "name": "Typing Avatars",
-    "description": "Replaces the typing indicator with the avatars of those who are typing.",
+    "description": "Replaces the typing indicator with the avatars of those who are typing. Compatible with Discord 345.9+ and Discord Revenge 1.3.0+",
     "authors": [
         {
             "name": "Fiery",
@@ -10,5 +10,10 @@
     "main": "src/index.tsx",
     "vendetta": {
         "icon": "ic_feedback"
+    },
+    "version": "2.0.0",
+    "compatibility": {
+        "discord": "345.9+",
+        "discord-revenge": "1.3.0+"
     }
 }
