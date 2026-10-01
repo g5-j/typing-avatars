@@ -9,17 +9,26 @@ let unpatch;
 
 export default {
     onLoad: () => {
-        unpatch = after("default", TypingWrapper, ([{ channel }], res) => {
-            if (!res) return;
-            const Typing = res.props?.children;
+        try {
+            unpatch = after("default", TypingWrapper, ([{ channel }], res) => {
+                if (!res) return;
+                const Typing = res.props?.children;
 
-            const unpatchTyping = after("type", Typing, (_, res) => {
-                React.useEffect(() => () => { unpatchTyping() }, []);
-                res.props.children[0].props.children.splice(0, 1, <TypingAvatars channel={channel} />);
+                const unpatchTyping = after("type", Typing, (_, res) => {
+                    React.useEffect(() => () => { unpatchTyping() }, []);
+                    // Handle both Discord 345.9+ and Discord Revenge 1.3.0+ typing indicator structure
+                    if (res.props?.children?.[0]?.props?.children) {
+                        res.props.children[0].props.children.splice(0, 1, <TypingAvatars channel={channel} />);
+                    }
+                });
             });
-        });
+        } catch (error) {
+            console.error("[TypingAvatars] Failed to patch typing wrapper:", error);
+        }
     },
     onUnload: () => {
-        unpatch();
+        if (unpatch) {
+            unpatch();
+        }
     },
 };
